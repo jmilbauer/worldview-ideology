@@ -4,6 +4,7 @@ import sys
 from tqdm import tqdm
 import logging
 import pickle
+from nltk.tokenize import sent_tokenize, word_tokenize
 
 # modeling
 from gensim.models.phrases import Phrases, Phraser
@@ -11,6 +12,13 @@ from gensim.models.phrases import Phrases, Phraser
 logging.basicConfig(level=logging.INFO)
 
 from utils import get_sentences
+
+def tokenize(line):
+    """
+    basic tokenization of a line.
+    """
+    result = [w.lower() for s in sent_tokenize(line) for w in word_tokenize(s)]
+    return ' '.join(result)
 
 def get_phrases(sentences, mc, th):
     """
@@ -103,5 +111,7 @@ if __name__ == "__main__":
     targets = [targetdir / s.name for s in sources]
     
     # tweak the phraseseq to go beyond bigrams, change sensitivity, etc.
+    # [(5,100)] will do one round, with min_count=5 and threshold=100, building bigrams
+    # [(5,100), (5,100)] will do two rounds, with the same parameters. This will produce trigrams and some 4-grams
     phraseseq = [(5,100)]
     main(sources, targets, phraseseq)
